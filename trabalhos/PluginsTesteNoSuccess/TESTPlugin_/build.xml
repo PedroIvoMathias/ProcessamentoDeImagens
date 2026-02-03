@@ -25,4 +25,3 @@ Building the .jar file.
 <copy file="TESTPlugin_.jar" toDir="${pluginsDir}" />
 </target>
 </project>
-
