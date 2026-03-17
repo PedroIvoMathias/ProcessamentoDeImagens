@@ -31,14 +31,17 @@ public class Convex_ implements PlugIn {
 
     private ImageProcessor aplicarComponentesConexos(ImageProcessor ip) {
 
-        int altura = ip.getHeight();
         int largura = ip.getWidth();
+        int altura = ip.getHeight();
 
         ImageProcessor saida = new ByteProcessor(largura, altura);
 
-
-        saida.setValue(255);// fundo branco
-        saida.fill();
+        
+        for (int y = 0; y < altura; y++) {
+            for (int x = 0; x < largura; x++) {
+                saida.putPixel(x, y, 255);
+            }
+        }
 
         int[][] visitado = new int[largura][altura];
 
@@ -61,13 +64,42 @@ public class Convex_ implements PlugIn {
 
                     fila.add(new int[]{x, y});
 
+                    while (!fila.isEmpty()) {
 
+                        int[] p = fila.remove();
+
+                        int px = p[0];
+                        int py = p[1];
+
+                        verificarVizinho(px + 1, py, largura, altura, ip, visitado, fila, saida, tomCinza);
+                        verificarVizinho(px - 1, py, largura, altura, ip, visitado, fila, saida, tomCinza);
+                        verificarVizinho(px, py + 1, largura, altura, ip, visitado, fila, saida, tomCinza);
+                        verificarVizinho(px, py - 1, largura, altura, ip, visitado, fila, saida, tomCinza);
                     }
 
                     label++;
                 }
             }
+        }
+
+        IJ.showMessage("Componentes", "Total encontrados: " + (label - 1));
 
         return saida;
+    }
+
+    private void verificarVizinho(int x, int y, int largura, int altura,ImageProcessor entrada,int[][] visitado,Queue<int[]> fila,
+                                  ImageProcessor saida,int tomCinza) {
+
+        if (x < 0 || x >= largura || y < 0 || y >= altura)
+            return;
+
+        if (entrada.getPixel(x, y) != 0 && visitado[x][y] == 0) {
+
+            visitado[x][y] = 1;
+
+            saida.putPixel(x, y, tomCinza);
+
+            fila.add(new int[]{x, y});
+        }
     }
 }
